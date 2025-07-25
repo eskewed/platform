@@ -2654,6 +2654,15 @@
       "shouldPublish": false
     },
     {
+      "packageName": "@hcengineering/network",
+      "projectFolder": "network/core",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@hcengineering/network-zeromq",
+      "projectFolder": "network/zeromq"
+    },
+    {
       "packageName": "@hcengineering/pod-process",
       "projectFolder": "services/process",
       "shouldPublish": false

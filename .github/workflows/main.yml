@@ -23,6 +23,7 @@ on:
 env:
   CacheFolders: |
     communication
+    network
     common
     desktop
     desktop-package
