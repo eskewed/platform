@@ -979,7 +979,7 @@ export function devTool (
               return
             }
 
-            await backup(toolCtx, pipeline, wsIds, storage, {
+            await backup(toolCtx, pipeline, wsIds, storage, db, {
               force: cmd.force,
               include: cmd.include === '*' ? undefined : new Set(cmd.include.split(';').map((it) => it.trim())),
               skipDomains: (cmd.skip ?? '').split(';').map((it) => it.trim()),
