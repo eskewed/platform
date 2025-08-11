@@ -915,7 +915,7 @@ export function devTool (
 
   program
     .command('backup <dirName> <workspace>')
-    .description('dump workspace transactions and minio resources')
+    .description('dump workspace transactions, blobs and accounts')
     .option('-i, --include <include>', 'A list of ; separated domain names to include during backup', '*')
     .option('-s, --skip <skip>', 'A list of ; separated domain names to skip during backup', '')
     .option('--full', 'Full recheck', false)
@@ -928,6 +928,7 @@ export function devTool (
     .option('-f, --force', 'Force backup', false)
     .option('-t, --timeout <timeout>', 'Connect timeout in seconds', '30')
     .option('-k, --keepSnapshots <keepSnapshots>', 'Keep snapshots for days', '14')
+    .option('-fv, --fullVerify', 'Full verification', false)
     .action(
       async (
         dirName: string,
@@ -941,6 +942,7 @@ export function devTool (
           contentTypes: string
           full: boolean
           keepSnapshots: string
+          fullVerify: boolean
         }
       ) => {
         const storage = await createFileBackupStorage(dirName)
@@ -990,7 +992,8 @@ export function devTool (
                 .split(';')
                 .map((it) => it.trim())
                 .filter((it) => it.length > 0),
-              keepSnapshots: parseInt(cmd.keepSnapshots)
+              keepSnapshots: parseInt(cmd.keepSnapshots),
+              fullVerify: cmd.fullVerify
             })
           } catch (err: any) {
             toolCtx.error('Failed to backup workspace', { err, workspace })
