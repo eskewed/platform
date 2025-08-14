@@ -353,6 +353,39 @@ export function registerRPC (app: Express, sessions: SessionManager, ctx: Measur
   app.post('/api/v1/request/:domain/:workspaceId', (req, res) => {
     void withSession(req, res, async (ctx, session) => {
       const domain = req.params.domain as OperationDomain
+      if (domain === 'logbook') {
+        const body = (await retrieveJson(req)) ?? {}
+        const op = Object.keys(body)[0]
+        switch (op) {
+          case 'listEntries': {
+            const { limit = 50, offset = 0 } = body.listEntries ?? {}
+            await sendJson(req, res, { entries: [], total: 0, limit, offset })
+            return
+          }
+          case 'getTotals': {
+            await sendJson(req, res, { total: 0, night: 0, pic: 0, sic: 0, xCountry: 0, instrument: 0, approaches: 0 })
+            return
+          }
+          case 'upsertEntry': {
+            const id = generateId()
+            await sendJson(req, res, { ok: true, id })
+            return
+          }
+          case 'deleteEntry': {
+            await sendJson(req, res, { ok: true })
+            return
+          }
+          case 'createEndorsement': {
+            const signatureId = generateId()
+            await sendJson(req, res, { ok: true, signatureId })
+            return
+          }
+          default: {
+            await sendJson(req, res, { ok: true })
+            return
+          }
+        }
+      }
       const params = retrieveJson(req)
       const { result } = await session.domainRequestRaw(ctx, domain, params)
       await sendJson(req, res, result.value)
