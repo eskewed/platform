@@ -27,12 +27,14 @@ services:
     ports:
       - 27018:27018
     restart: unless-stopped
-  cockroach:
-    image: cockroachdb/cockroach:v24.1.2
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
     ports:
-      - '26258:26257'
-      - '18089:8080'
-    command: start-single-node --insecure
+      - '5433:5432'
     restart: unless-stopped
   redpanda:
     image: docker.redpanda.com/redpandadata/redpanda:v24.3.6
@@ -113,7 +115,7 @@ services:
     links:
       - mongodb
       - minio
-      - cockroach
+      - postgres
     ports:
       - 3003:3003
     volumes:
@@ -135,7 +137,7 @@ services:
     image: hardcoreeng/workspace
     links:
       - mongodb
-      - cockroach
+      - postgres
       - minio
       - redpanda
     depends_on:
@@ -196,7 +198,7 @@ services:
       - elastic
       - minio
       - rekoni
-      - cockroach
+      - postgres
       - account
       - stats
       - redpanda

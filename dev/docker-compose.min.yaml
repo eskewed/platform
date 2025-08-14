@@ -97,7 +97,7 @@ services:
       - ADMIN_EMAILS=admin,${PLATFORM_ADMIN_EMAILS}
       - STATS_URL=http://huly.local:4900
       - WORKSPACE_LIMIT_PER_USER=10000
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       # - DB_URL=${MONGO_URL}
       # - DB_NS=account-2
       # Pass only one region to disallow selection for new workspaces.
@@ -138,7 +138,7 @@ services:
       - REGION=cockroach
       - SERVER_SECRET=secret
       - QUEUE_CONFIG=${QUEUE_CONFIG}
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       - STATS_URL=http://huly.local:4900
       - STORAGE_CONFIG=${STORAGE_CONFIG}
       - MODEL_ENABLED=*
@@ -224,7 +224,7 @@ services:
       - ENABLE_COMPRESSION=true
       - FULLTEXT_URL=http://huly.local:4702
       - STATS_URL=http://huly.local:4900
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       - METRICS_CONSOLE=false
       - METRICS_FILE=metrics.txt
       - STORAGE_CONFIG=${STORAGE_CONFIG}
@@ -252,7 +252,7 @@ services:
       - REGION=cockroach
       - SERVER_SECRET=secret
       - QUEUE_CONFIG=${QUEUE_CONFIG}
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       - FULLTEXT_DB_URL=http://huly.local:9200
       - ELASTIC_INDEX_NAME=local_storage_index # Same index for simplicity
       - STORAGE_CONFIG=${STORAGE_CONFIG}
@@ -280,7 +280,7 @@ services:
       - ACCOUNTS_URL=http://huly.local:3000
       - STATS_URL=http://huly.local:4900
       - STREAM_URL=http://huly.local:1080/recording
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       - BUCKETS=blobs,eu|http://minio:9000?accessKey=minioadmin&secretKey=minioadmin
     restart: unless-stopped
 volumes:

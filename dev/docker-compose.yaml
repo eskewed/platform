@@ -1,4 +1,17 @@
 services:
+  postgres:
+    image: postgres:16
+    extra_hosts:
+      - 'huly.local:host-gateway'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - dbpg:/var/lib/postgresql/data
+    restart: unless-stopped
   stream:
     image: 'hardcoreeng/stream'
     extra_hosts:
@@ -27,17 +40,6 @@ services:
       - SECRET=secret
       - REGION=cockroach
       - QUEUE_CONFIG=${QUEUE_CONFIG}
-    restart: unless-stopped
-  cockroach:
-    image: cockroachdb/cockroach:latest-v24.2
-    extra_hosts:
-      - 'huly.local:host-gateway'
-    ports:
-      - '26257:26257'
-      - '8089:8080'
-    command: start-single-node --insecure
-    volumes:
-      - cockroach_db:/cockroach/cockroach-data
     restart: unless-stopped
   redpanda:
     image: docker.redpanda.com/redpandadata/redpanda:v24.3.6
@@ -147,7 +149,7 @@ services:
       - ADMIN_EMAILS=admin,${PLATFORM_ADMIN_EMAILS}
       - STATS_URL=http://huly.local:4900
       - WORKSPACE_LIMIT_PER_USER=10000
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       # - DB_NS=account-2
       # Pass only one region to disallow selection for new workspaces.
       - REGION_INFO=cockroach|CockroachDB
@@ -180,7 +182,7 @@ services:
     extra_hosts:
       - 'huly.local:host-gateway'
     links:
-      - cockroach
+      - postgres
       - minio
       - stats
     depends_on:
@@ -193,7 +195,7 @@ services:
       - REGION=cockroach
       - SERVER_SECRET=secret
       - QUEUE_CONFIG=${QUEUE_CONFIG}
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       - STATS_URL=http://huly.local:4900
       - STORAGE_CONFIG=${STORAGE_CONFIG}
       - ACCOUNTS_URL=http://huly.local:3000
@@ -268,7 +270,7 @@ services:
     extra_hosts:
       - 'huly.local:host-gateway'
     links:
-      - cockroach
+      - postgres
       - minio
       - account
       - stats
@@ -287,7 +289,7 @@ services:
       - ENABLE_COMPRESSION=true
       - FULLTEXT_URL=http://huly.local:4702
       - STATS_URL=http://huly.local:4900
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       - METRICS_CONSOLE=false
       - METRICS_FILE=metrics.txt
       - STORAGE_CONFIG=${STORAGE_CONFIG}
@@ -325,7 +327,7 @@ services:
     restart: unless-stopped
     links:
       - elastic
-      - cockroach
+      - postgres
       - rekoni
     ports:
       - 4702:4702
@@ -334,7 +336,7 @@ services:
       - REGION=cockroach
       - SERVER_SECRET=secret
       - QUEUE_CONFIG=${QUEUE_CONFIG}
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       - FULLTEXT_DB_URL=http://huly.local:9200
       - ELASTIC_INDEX_NAME=local_storage_index # Same index for simplicity
       - STORAGE_CONFIG=${STORAGE_CONFIG}
@@ -426,7 +428,7 @@ services:
     restart: unless-stopped
     environment:
       - ACCOUNTS_URL=http://huly.local:3000
-      - DB_URL=postgresql://root@huly.local:26257/defaultdb?sslmode=disable
+      - DB_URL=postgresql://root@huly.local:5432/postgres?sslmode=disable
       - PORT=9087
       - SECRET=secret
       - SERVICE_ID=msg2file-service
@@ -445,7 +447,7 @@ services:
       - PORT=4009
       - SECRET=secret
       - SERVICE_ID=export-service
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       - STATS_URL=http://huly.local:4900
       - STORAGE_CONFIG=${STORAGE_CONFIG}
       - ACCOUNTS_URL=http://huly.local:3000
@@ -457,7 +459,7 @@ services:
     depends_on:
       minio:
         condition: service_healthy
-      cockroach:
+      postgres:
         condition: service_started
       stats:
         condition: service_started
@@ -470,7 +472,7 @@ services:
       - SECRET=secret
       - ACCOUNTS_URL=http://huly.local:3000
       - STATS_URL=http://huly.local:4900
-      - DB_URL=${DB_CR_URL}
+      - DB_URL=${DB_URL}
       - BUCKETS=blobs,eu|http://minio:9000?accessKey=minioadmin&secretKey=minioadmin
       - REGION=cockroach
       - QUEUE_CONFIG=${QUEUE_CONFIG}
@@ -479,14 +481,14 @@ services:
   hulykvs:
     image: hardcoreeng/hulykvs
     depends_on:
-      cockroach:
+      postgres:
         condition: service_started
     extra_hosts:
       - 'huly.local:host-gateway'
     ports:
       - 8094:8094
     environment:
-      - HULY_DB_CONNECTION=${DB_CR_URL}
+      - HULY_DB_CONNECTION=${DB_URL}
       - HULY_TOKEN_SECRET=secret
     restart: unless-stopped
   hulygun:
@@ -526,7 +528,7 @@ services:
     depends_on:
       minio:
         condition: service_healthy
-      cockroach:
+      postgres:
         condition: service_started
       stats:
         condition: service_started
