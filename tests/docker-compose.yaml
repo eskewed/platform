@@ -255,7 +255,7 @@ services:
     depends_on:
       redpanda:
         condition: service_started
-      cockroach:
+      postgres:
         condition: service_started
       elastic:
         condition: service_healthy
